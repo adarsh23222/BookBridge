@@ -11,7 +11,6 @@ export default function BookDetail() {
   const navigate   = useNavigate();
   const { user }   = useAuth();
   const [book,   setBook]   = useState(null);
-  
   const [rating, setRating] = useState(null);
 
   useEffect(() => {
@@ -19,8 +18,6 @@ export default function BookDetail() {
       const { data } = await api.get(`/books/${id}`);
       setBook(data);
       try {
-        
-        
         const { data: r } = await api.get(`/ratings/user/${data.seller_id}`);
         setRating(r);
       } catch {}
@@ -35,14 +32,14 @@ export default function BookDetail() {
 
   const isOwn = user?.id === book.seller_id;
 
-  const buy = async () => {
+  const markSold = async () => {
     if (!user) { navigate("/login"); return; }
-    if (isOwn) return;
+    if (!isOwn) return;
     try {
       await api.post("/deals", { book_id: book.id, seller_id: book.seller_id });
-      toast.success("Deal recorded. Don't forget to rate the seller.");
+      toast.success("Book marked as sold!");
       navigate("/dashboard");
-    } catch { toast.error("Failed to record deal"); }
+    } catch { toast.error("Failed to mark as sold"); }
   };
 
   const deleteBook = async () => {
@@ -102,22 +99,30 @@ export default function BookDetail() {
 
           <div className="mt-6 flex flex-wrap gap-3">
             {isOwn ? (
-              <button data-testid="book-delete" onClick={deleteBook} className="border border-red-700 text-red-400 px-5 py-3 hover:bg-red-950 transition inline-flex items-center gap-2 text-sm">
-                <Trash2 className="w-4 h-4" /> Delete listing
-              </button>
-            ) : (
               <>
-                <button data-testid="book-chat" onClick={() => user ? navigate(`/chat/${book.seller_id}`) : navigate("/login")}
+                {!book.is_donation && book.status !== "sold" && (
+                  <button onClick={markSold}
+                    className="border border-[#658354] text-[#658354] px-5 py-3 hover:bg-[#658354]/10 transition inline-flex items-center gap-2 text-sm">
+                    <ShoppingBag className="w-4 h-4" /> Mark as Sold
+                  </button>
+                )}
+                <button data-testid="book-delete" onClick={deleteBook}
+                  className="border border-red-700 text-red-400 px-5 py-3 hover:bg-red-950 transition inline-flex items-center gap-2 text-sm">
+                  <Trash2 className="w-4 h-4" /> Delete listing
+                </button>
+              </>
+            ) : (
+              book.status !== "sold" ? (
+                <button data-testid="book-chat"
+                  onClick={() => user ? navigate(`/chat/${book.seller_id}`) : navigate("/login")}
                   className="btn-primary inline-flex items-center gap-2">
                   <MessageCircle className="w-4 h-4" /> Message Seller
                 </button>
-                {!book.is_donation && (
-                  <button data-testid="book-buy" onClick={buy}
-                    className="border border-[#27272A] hover:border-[#E27D60] px-5 py-3 inline-flex items-center gap-2 text-sm transition">
-                    <ShoppingBag className="w-4 h-4" /> Mark Purchased
-                  </button>
-                )}
-              </>
+              ) : (
+                <div className="text-[#A1A1AA] text-sm border border-[#27272A] px-5 py-3">
+                  This book has been sold
+                </div>
+              )
             )}
           </div>
         </div>
