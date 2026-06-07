@@ -25,8 +25,8 @@ export function formatApiError(detail) {
 
 export function fileUrl(fileId) {
   if (!fileId) return "";
-  if (fileId.startsWith("http") || fileId.startsWith("/api/"))
-    return `${BACKEND_URL}${fileId.startsWith("/") ? "" : "/"}${fileId}`;
+  if (fileId.startsWith("http")) return fileId;
+  if (fileId.startsWith("/api/")) return `${BACKEND_URL}${fileId}`;
   return `${API}/files/${fileId}`;
 }
 
