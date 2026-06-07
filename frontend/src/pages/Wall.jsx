@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
-import api, { fileUrl } from "@/lib/api";
+import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { Heart, MessageSquare, Upload, Send } from "lucide-react";
+import { Heart, MessageSquare, Upload, Send, Trash2 } from "lucide-react";
 import { timeIST, dateIST } from "@/lib/time";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+
+const BACKEND = import.meta.env.VITE_BACKEND_URL || "";
+
+function imgUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `${BACKEND}${url}`;
+}
 
 export default function Wall() {
   const { user }  = useAuth();
@@ -111,22 +119,44 @@ function PostCard({ post, onChange }) {
     setNewComment(""); loadComments(); onChange?.();
   };
 
+  const deletePost = async () => {
+    if (!window.confirm("Delete this post?")) return;
+    try {
+      await api.delete(`/wall/posts/${post.id}`);
+      toast.success("Post deleted");
+      onChange?.();
+    } catch { toast.error("Failed to delete"); }
+  };
+
   return (
     <article className="card-edge p-5" data-testid={`wall-post-${post.id}`}>
-      <header className="flex items-baseline justify-between mb-3">
+      <header className="flex items-start justify-between mb-3">
         <div>
           <div className="font-serif text-xl">{post.author_name}</div>
           <div className="text-[10px] uppercase tracking-[0.2em] text-[#A1A1AA]">
             {post.author_college} · {dateIST(post.created_at)} · {timeIST(post.created_at)} IST
           </div>
         </div>
+        {user?.id === post.author_id && (
+          <button onClick={deletePost} className="text-[#A1A1AA] hover:text-red-400 transition ml-2 flex-shrink-0">
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
       </header>
+
       <p className="text-[#e4e4e7] leading-relaxed whitespace-pre-wrap">{post.content}</p>
+
       {post.image_url && (
         <div className="mt-4 border border-[#27272A]">
-          <img src={fileUrl(post.image_url)} alt="" className="w-full max-h-96 object-cover" />
+          <img
+            src={imgUrl(post.image_url)}
+            alt=""
+            className="w-full max-h-96 object-cover"
+            onError={(e) => { e.target.style.display = "none"; }}
+          />
         </div>
       )}
+
       <footer className="mt-4 flex items-center gap-5 text-sm">
         <button data-testid={`like-${post.id}`} onClick={toggleLike}
           className={`inline-flex items-center gap-2 transition ${liked ? "text-[#E27D60]" : "text-[#A1A1AA] hover:text-[#E27D60]"}`}>
