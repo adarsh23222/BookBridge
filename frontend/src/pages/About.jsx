@@ -44,7 +44,7 @@ export default function About() {
             ["How do prices get suggested?",    "Our calculator factors MRP, condition and age of the book. You're free to set your own price."],
             ["Can I donate instead of selling?","Yes — toggle 'Donation' on the listing form. Your book will appear on the Donate page free of cost."],
             ["What's the Student Wall?",        "A campus-flavoured feed where students post updates, exchange notes, and rant about exams."],
-            ["What is an Author Ad?",           "Authors and publishers can submit promotional book content. A featured one appears as a popup once per session on the homepage."],
+            
             ["Is my data safe?",               "Passwords are bcrypt-hashed. JWT cookies are httpOnly. Email IDs are never sold."],
           ].map(([q, a], i) => (
             <AccordionItem key={i} value={`q-${i}`} data-testid={`faq-${i}`} className="border border-[#27272A] bg-[#141417] px-5">
