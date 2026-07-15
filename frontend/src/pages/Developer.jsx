@@ -240,7 +240,7 @@ export default function Developer() {
 
               {/* UPI ID Copy */}
               <div className="flex items-center gap-2 bg-[#0A0A0B] border border-[#27272A] px-4 py-3">
-                <span className="font-mono text-sm text-[#d4d4d8] flex-1">paladars071@okaxis</span>
+                <span className="font-mono text-sm text-[#d4d4d8] flex-1">adarsh2430343@okaxis</span>
                 <button
                   onClick={copyUPI}
                   className="text-[#A1A1AA] hover:text-[#E27D60] transition flex-shrink-0"
